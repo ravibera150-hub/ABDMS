@@ -51,6 +51,10 @@ if (!isset($_SESSION['police_id'])) {
 
     <br><br>
 
+    <a href="link_criminal.php">Link Criminal to FIR</a>
+
+    <br><br>
+
     <a href="logout.php">Logout</a>
 
 </body>
