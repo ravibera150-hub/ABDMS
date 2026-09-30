@@ -9,6 +9,8 @@ if (!isset($_SESSION['police_id'])) {
 
 require_once "backend/db.php";
 
+$search = $_GET['search'] ?? '';
+
 $sql = "SELECT
             report.report_id,
             fir.fir_number,
@@ -19,9 +21,25 @@ $sql = "SELECT
         FROM report
         INNER JOIN fir
             ON report.fir_id = fir.fir_id
+        WHERE fir.fir_number LIKE ?
+           OR report.report_type LIKE ?
+           OR report.remarks LIKE ?
         ORDER BY report.created_at DESC";
 
-$result = $conn->query($sql);
+$search_value = "%" . $search . "%";
+
+$stmt = $conn->prepare($sql);
+
+$stmt->bind_param(
+    "sss",
+    $search_value,
+    $search_value,
+    $search_value
+);
+
+$stmt->execute();
+
+$result = $stmt->get_result();
 
 ?>
 
@@ -43,6 +61,23 @@ $result = $conn->query($sql);
 
     <h2>Report Records</h2>
 
+    <form method="GET" action="report_records.php">
+
+        <input
+            type="text"
+            name="search"
+            placeholder="Search report..."
+            value="<?php echo htmlspecialchars($search); ?>"
+        >
+
+        <button type="submit">Search</button>
+
+        <a href="report_records.php">Clear</a>
+
+    </form>
+
+    <br>
+
     <table border="1" cellpadding="8">
 
         <tr>
@@ -54,35 +89,47 @@ $result = $conn->query($sql);
             <th>Created At</th>
         </tr>
 
-        <?php while ($row = $result->fetch_assoc()) { ?>
+        <?php if ($result->num_rows > 0) { ?>
 
-        <tr>
+            <?php while ($row = $result->fetch_assoc()) { ?>
 
-            <td>
-                <?php echo htmlspecialchars($row['report_id']); ?>
-            </td>
+                <tr>
 
-            <td>
-                <?php echo htmlspecialchars($row['fir_number']); ?>
-            </td>
+                    <td>
+                        <?php echo htmlspecialchars($row['report_id']); ?>
+                    </td>
 
-            <td>
-                <?php echo htmlspecialchars($row['report_date']); ?>
-            </td>
+                    <td>
+                        <?php echo htmlspecialchars($row['fir_number']); ?>
+                    </td>
 
-            <td>
-                <?php echo htmlspecialchars($row['report_type']); ?>
-            </td>
+                    <td>
+                        <?php echo htmlspecialchars($row['report_date']); ?>
+                    </td>
 
-            <td>
-                <?php echo htmlspecialchars($row['remarks'] ?? ''); ?>
-            </td>
+                    <td>
+                        <?php echo htmlspecialchars($row['report_type']); ?>
+                    </td>
 
-            <td>
-                <?php echo htmlspecialchars($row['created_at']); ?>
-            </td>
+                    <td>
+                        <?php echo htmlspecialchars($row['remarks'] ?? ''); ?>
+                    </td>
 
-        </tr>
+                    <td>
+                        <?php echo htmlspecialchars($row['created_at']); ?>
+                    </td>
+
+                </tr>
+
+            <?php } ?>
+
+        <?php } else { ?>
+
+            <tr>
+                <td colspan="6">
+                    No report records found.
+                </td>
+            </tr>
 
         <?php } ?>
 
@@ -102,6 +149,7 @@ $result = $conn->query($sql);
 
 <?php
 
+$stmt->close();
 $conn->close();
 
 ?>

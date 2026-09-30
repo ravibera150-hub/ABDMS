@@ -9,6 +9,8 @@ if (!isset($_SESSION['police_id'])) {
 
 require_once "backend/db.php";
 
+$search = $_GET['search'] ?? '';
+
 $sql = "SELECT
             evidence.evidence_id,
             fir.fir_number,
@@ -20,9 +22,27 @@ $sql = "SELECT
         FROM evidence
         INNER JOIN fir
             ON evidence.fir_id = fir.fir_id
+        WHERE fir.fir_number LIKE ?
+           OR evidence.file_name LIKE ?
+           OR evidence.file_type LIKE ?
+           OR evidence.description LIKE ?
         ORDER BY evidence.uploaded_at DESC";
 
-$result = $conn->query($sql);
+$search_value = "%" . $search . "%";
+
+$stmt = $conn->prepare($sql);
+
+$stmt->bind_param(
+    "ssss",
+    $search_value,
+    $search_value,
+    $search_value,
+    $search_value
+);
+
+$stmt->execute();
+
+$result = $stmt->get_result();
 
 ?>
 
@@ -44,6 +64,23 @@ $result = $conn->query($sql);
 
     <h2>Evidence Records</h2>
 
+    <form method="GET" action="evidence_records.php">
+
+        <input
+            type="text"
+            name="search"
+            placeholder="Search evidence..."
+            value="<?php echo htmlspecialchars($search); ?>"
+        >
+
+        <button type="submit">Search</button>
+
+        <a href="evidence_records.php">Clear</a>
+
+    </form>
+
+    <br>
+
     <table border="1" cellpadding="8">
 
         <tr>
@@ -56,48 +93,65 @@ $result = $conn->query($sql);
             <th>View File</th>
         </tr>
 
-        <?php while ($row = $result->fetch_assoc()) { ?>
+        <?php if ($result->num_rows > 0) { ?>
 
-        <tr>
+            <?php while ($row = $result->fetch_assoc()) { ?>
 
-            <td>
-                <?php echo htmlspecialchars($row['evidence_id']); ?>
-            </td>
+                <tr>
 
-            <td>
-                <?php echo htmlspecialchars($row['fir_number']); ?>
-            </td>
+                    <td>
+                        <?php echo htmlspecialchars($row['evidence_id']); ?>
+                    </td>
 
-            <td>
-                <?php echo htmlspecialchars($row['file_name']); ?>
-            </td>
+                    <td>
+                        <?php echo htmlspecialchars($row['fir_number']); ?>
+                    </td>
 
-            <td>
-                <?php echo htmlspecialchars($row['file_type'] ?? ''); ?>
-            </td>
+                    <td>
+                        <?php echo htmlspecialchars($row['file_name']); ?>
+                    </td>
 
-            <td>
-                <?php echo htmlspecialchars($row['description'] ?? ''); ?>
-            </td>
+                    <td>
+                        <?php echo htmlspecialchars($row['file_type'] ?? ''); ?>
+                    </td>
 
-            <td>
-                <?php echo htmlspecialchars($row['uploaded_at']); ?>
-            </td>
+                    <td>
+                        <?php echo htmlspecialchars($row['description'] ?? ''); ?>
+                    </td>
 
-            <td>
-                <a href="<?php echo htmlspecialchars($row['file_path']); ?>"
-                   target="_blank">
-                    Open File
-                </a>
-            </td>
+                    <td>
+                        <?php echo htmlspecialchars($row['uploaded_at']); ?>
+                    </td>
 
-        </tr>
+                    <td>
+                        <a
+                            href="<?php echo htmlspecialchars($row['file_path']); ?>"
+                            target="_blank">
+                            Open File
+                        </a>
+                    </td>
+
+                </tr>
+
+            <?php } ?>
+
+        <?php } else { ?>
+
+            <tr>
+                <td colspan="7">
+                    No evidence records found.
+                </td>
+            </tr>
 
         <?php } ?>
 
     </table>
 
     <br>
+
+    <a href="evidence_add.php">Add Evidence</a>
+
+    <br><br>
 
     <a href="dashboard.php">Back to Dashboard</a>
 
@@ -107,6 +161,7 @@ $result = $conn->query($sql);
 
 <?php
 
+$stmt->close();
 $conn->close();
 
 ?>
