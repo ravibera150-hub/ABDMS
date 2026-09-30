@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 require_once "db.php";
 
 $email = $_POST['email'];
@@ -17,10 +19,21 @@ if ($result->num_rows == 1) {
 
     $police = $result->fetch_assoc();
 
-    if ($password === $police['password']) {
-        echo "Login successful!";
+    if (password_verify($password, $police['password'])) {
+
+        // Store officer information in session
+        $_SESSION['police_id'] = $police['police_id'];
+        $_SESSION['full_name'] = $police['full_name'];
+        $_SESSION['email'] = $police['email'];
+
+        // Go to dashboard
+        header("Location: ../dashboard.php");
+        exit();
+
     } else {
+
         echo "Invalid password!";
+
     }
 
 } else {
