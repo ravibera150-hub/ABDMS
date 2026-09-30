@@ -67,6 +67,14 @@ if (!isset($_SESSION['police_id'])) {
 
     <br><br>
 
+    <a href="report_add.php">Add Report</a>
+
+    <br><br>
+
+    <a href="report_records.php">View Reports</a>
+
+    <br><br>
+
     <a href="logout.php">Logout</a>
 
 </body>
