@@ -56,6 +56,7 @@ $result = $stmt->get_result();
 <head>
 
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>FIR Records</title>
@@ -67,6 +68,7 @@ $result = $stmt->get_result();
     <h1>Crime Record Management System</h1>
 
     <h2>FIR Records</h2>
+
 
     <form method="GET" action="fir_records.php">
 
@@ -83,21 +85,36 @@ $result = $stmt->get_result();
 
     </form>
 
+
     <br>
+
 
     <table border="1" cellpadding="8">
 
         <tr>
+
             <th>FIR ID</th>
+
             <th>FIR Number</th>
+
             <th>Crime Type</th>
+
             <th>Registered By</th>
+
             <th>Incident Date</th>
+
             <th>Location</th>
+
             <th>Description</th>
+
             <th>Status</th>
+
             <th>Created At</th>
+
+            <th>Action</th>
+
         </tr>
+
 
         <?php if ($result->num_rows > 0) { ?>
 
@@ -105,23 +122,49 @@ $result = $stmt->get_result();
 
                 <tr>
 
-                    <td><?php echo htmlspecialchars($row['fir_id']); ?></td>
+                    <td>
+                        <?php echo htmlspecialchars($row['fir_id']); ?>
+                    </td>
 
-                    <td><?php echo htmlspecialchars($row['fir_number']); ?></td>
+                    <td>
+                        <?php echo htmlspecialchars($row['fir_number']); ?>
+                    </td>
 
-                    <td><?php echo htmlspecialchars($row['crime_name']); ?></td>
+                    <td>
+                        <?php echo htmlspecialchars($row['crime_name']); ?>
+                    </td>
 
-                    <td><?php echo htmlspecialchars($row['full_name']); ?></td>
+                    <td>
+                        <?php echo htmlspecialchars($row['full_name']); ?>
+                    </td>
 
-                    <td><?php echo htmlspecialchars($row['incident_date']); ?></td>
+                    <td>
+                        <?php echo htmlspecialchars($row['incident_date']); ?>
+                    </td>
 
-                    <td><?php echo htmlspecialchars($row['location']); ?></td>
+                    <td>
+                        <?php echo htmlspecialchars($row['location']); ?>
+                    </td>
 
-                    <td><?php echo htmlspecialchars($row['description']); ?></td>
+                    <td>
+                        <?php echo htmlspecialchars($row['description']); ?>
+                    </td>
 
-                    <td><?php echo htmlspecialchars($row['status']); ?></td>
+                    <td>
+                        <?php echo htmlspecialchars($row['status']); ?>
+                    </td>
 
-                    <td><?php echo htmlspecialchars($row['created_at']); ?></td>
+                    <td>
+                        <?php echo htmlspecialchars($row['created_at']); ?>
+                    </td>
+
+                    <td>
+
+                        <a href="fir_edit.php?id=<?php echo $row['fir_id']; ?>">
+                            Edit
+                        </a>
+
+                    </td>
 
                 </tr>
 
@@ -131,7 +174,7 @@ $result = $stmt->get_result();
 
             <tr>
 
-                <td colspan="9">
+                <td colspan="10">
                     No FIR records found.
                 </td>
 
@@ -141,13 +184,22 @@ $result = $stmt->get_result();
 
     </table>
 
+
     <br>
 
-    <a href="fir_register.php">Register New FIR</a>
+
+    <a href="fir_register.php">
+        Register New FIR
+    </a>
+
 
     <br><br>
 
-    <a href="dashboard.php">Back to Dashboard</a>
+
+    <a href="dashboard.php">
+        Back to Dashboard
+    </a>
+
 
 </body>
 
@@ -156,6 +208,7 @@ $result = $stmt->get_result();
 <?php
 
 $stmt->close();
+
 $conn->close();
 
 ?>

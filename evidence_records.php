@@ -52,6 +52,7 @@ $result = $stmt->get_result();
 <head>
 
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Evidence Records</title>
@@ -63,6 +64,7 @@ $result = $stmt->get_result();
     <h1>Crime Record Management System</h1>
 
     <h2>Evidence Records</h2>
+
 
     <form method="GET" action="evidence_records.php">
 
@@ -79,19 +81,32 @@ $result = $stmt->get_result();
 
     </form>
 
+
     <br>
+
 
     <table border="1" cellpadding="8">
 
         <tr>
+
             <th>Evidence ID</th>
+
             <th>FIR Number</th>
+
             <th>File Name</th>
+
             <th>File Type</th>
+
             <th>Description</th>
+
             <th>Uploaded At</th>
+
             <th>View File</th>
+
+            <th>Action</th>
+
         </tr>
+
 
         <?php if ($result->num_rows > 0) { ?>
 
@@ -124,11 +139,21 @@ $result = $stmt->get_result();
                     </td>
 
                     <td>
+
                         <a
                             href="<?php echo htmlspecialchars($row['file_path']); ?>"
                             target="_blank">
                             Open File
                         </a>
+
+                    </td>
+
+                    <td>
+
+                        <a href="evidence_edit.php?id=<?php echo $row['evidence_id']; ?>">
+                            Edit
+                        </a>
+
                     </td>
 
                 </tr>
@@ -138,22 +163,33 @@ $result = $stmt->get_result();
         <?php } else { ?>
 
             <tr>
-                <td colspan="7">
+
+                <td colspan="8">
                     No evidence records found.
                 </td>
+
             </tr>
 
         <?php } ?>
 
     </table>
 
+
     <br>
 
-    <a href="evidence_add.php">Add Evidence</a>
+
+    <a href="evidence_add.php">
+        Add Evidence
+    </a>
+
 
     <br><br>
 
-    <a href="dashboard.php">Back to Dashboard</a>
+
+    <a href="dashboard.php">
+        Back to Dashboard
+    </a>
+
 
 </body>
 
@@ -162,6 +198,7 @@ $result = $stmt->get_result();
 <?php
 
 $stmt->close();
+
 $conn->close();
 
 ?>

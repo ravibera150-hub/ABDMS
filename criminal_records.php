@@ -58,6 +58,7 @@ $result = $stmt->get_result();
 <head>
 
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Criminal Records</title>
@@ -69,6 +70,7 @@ $result = $stmt->get_result();
     <h1>Crime Record Management System</h1>
 
     <h2>Criminal Records</h2>
+
 
     <form method="GET" action="criminal_records.php">
 
@@ -85,20 +87,34 @@ $result = $stmt->get_result();
 
     </form>
 
+
     <br>
+
 
     <table border="1" cellpadding="8">
 
         <tr>
+
             <th>Criminal ID</th>
+
             <th>Name</th>
+
             <th>Gender</th>
+
             <th>Date of Birth</th>
+
             <th>Address</th>
+
             <th>Mobile</th>
+
             <th>Identification Mark</th>
+
             <th>Associated FIRs</th>
+
+            <th>Action</th>
+
         </tr>
+
 
         <?php if ($result->num_rows > 0) { ?>
 
@@ -140,6 +156,14 @@ $result = $stmt->get_result();
                         ); ?>
                     </td>
 
+                    <td>
+
+                        <a href="criminal_edit.php?id=<?php echo $row['criminal_id']; ?>">
+                            Edit
+                        </a>
+
+                    </td>
+
                 </tr>
 
             <?php } ?>
@@ -147,22 +171,33 @@ $result = $stmt->get_result();
         <?php } else { ?>
 
             <tr>
-                <td colspan="8">
+
+                <td colspan="9">
                     No criminal records found.
                 </td>
+
             </tr>
 
         <?php } ?>
 
     </table>
 
+
     <br>
 
-    <a href="criminal_register.php">Add Criminal</a>
+
+    <a href="criminal_register.php">
+        Add Criminal
+    </a>
+
 
     <br><br>
 
-    <a href="dashboard.php">Back to Dashboard</a>
+
+    <a href="dashboard.php">
+        Back to Dashboard
+    </a>
+
 
 </body>
 
@@ -171,6 +206,7 @@ $result = $stmt->get_result();
 <?php
 
 $stmt->close();
+
 $conn->close();
 
 ?>

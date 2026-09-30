@@ -44,11 +44,13 @@ $result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Report Records</title>
@@ -60,6 +62,7 @@ $result = $stmt->get_result();
     <h1>Crime Record Management System</h1>
 
     <h2>Report Records</h2>
+
 
     <form method="GET" action="report_records.php">
 
@@ -76,18 +79,30 @@ $result = $stmt->get_result();
 
     </form>
 
+
     <br>
+
 
     <table border="1" cellpadding="8">
 
         <tr>
+
             <th>Report ID</th>
+
             <th>FIR Number</th>
+
             <th>Report Date</th>
+
             <th>Report Type</th>
+
             <th>Remarks</th>
+
             <th>Created At</th>
+
+            <th>Action</th>
+
         </tr>
+
 
         <?php if ($result->num_rows > 0) { ?>
 
@@ -119,6 +134,14 @@ $result = $stmt->get_result();
                         <?php echo htmlspecialchars($row['created_at']); ?>
                     </td>
 
+                    <td>
+
+                        <a href="report_edit.php?id=<?php echo $row['report_id']; ?>">
+                            Edit
+                        </a>
+
+                    </td>
+
                 </tr>
 
             <?php } ?>
@@ -126,22 +149,35 @@ $result = $stmt->get_result();
         <?php } else { ?>
 
             <tr>
-                <td colspan="6">
+
+                <td colspan="7">
+
                     No report records found.
+
                 </td>
+
             </tr>
 
         <?php } ?>
 
     </table>
 
+
     <br>
 
-    <a href="report_add.php">Add Another Report</a>
+
+    <a href="report_add.php">
+        Add Another Report
+    </a>
+
 
     <br><br>
 
-    <a href="dashboard.php">Back to Dashboard</a>
+
+    <a href="dashboard.php">
+        Back to Dashboard
+    </a>
+
 
 </body>
 
@@ -150,6 +186,7 @@ $result = $stmt->get_result();
 <?php
 
 $stmt->close();
+
 $conn->close();
 
 ?>
