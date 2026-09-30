@@ -35,6 +35,22 @@ if (!isset($_SESSION['police_id'])) {
         <?php echo htmlspecialchars($_SESSION['email']); ?>
     </p>
 
+    <hr>
+
+    <h3>Police Operations</h3>
+
+    <a href="fir_register.php">Register FIR</a>
+
+    <br><br>
+
+    <a href="fir_records.php">View FIR Records</a>
+
+    <br><br>
+
+    <a href="criminal_register.php">Add Criminal</a>
+
+    <br><br>
+
     <a href="logout.php">Logout</a>
 
 </body>
