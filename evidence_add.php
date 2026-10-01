@@ -403,7 +403,7 @@ $result = $conn->query($sql);
                     >
 
                     <span class="file-help">
-                        Select the evidence file associated with this FIR.
+                        Allowed formats: JPG, PNG, GIF, PDF, TXT. Maximum size: 5 MB.
                     </span>
 
                 </div>

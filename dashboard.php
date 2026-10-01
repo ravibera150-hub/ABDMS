@@ -91,6 +91,8 @@ if ($result) {
 
         <a href="criminal_register.php">Add Criminal</a>
 
+        <a href="link_criminal.php">Link Criminal to FIR</a>
+
         <a href="evidence_add.php">Add Evidence</a>
 
         <a href="report_add.php">Add Report</a>
