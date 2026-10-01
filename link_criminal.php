@@ -9,10 +9,17 @@ if (!isset($_SESSION['police_id'])) {
 
 require_once "backend/db.php";
 
-$fir_sql = "SELECT fir_id, fir_number FROM fir ORDER BY fir_id DESC";
+$fir_sql = "SELECT fir_id, fir_number
+            FROM fir
+            ORDER BY fir_id DESC";
+
 $fir_result = $conn->query($fir_sql);
 
-$criminal_sql = "SELECT criminal_id, name FROM criminal ORDER BY name";
+
+$criminal_sql = "SELECT criminal_id, name
+                 FROM criminal
+                 ORDER BY name";
+
 $criminal_result = $conn->query($criminal_sql);
 
 ?>
@@ -21,63 +28,486 @@ $criminal_result = $conn->query($criminal_sql);
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Link Criminal to FIR</title>
+
+
+    <style>
+
+        :root {
+            --navy: #172033;
+            --navy-light: #24304a;
+            --gold: #c9a227;
+            --cream: #f5f2ea;
+            --white: #ffffff;
+            --text: #263044;
+            --muted: #70798a;
+            --border: #dfe3e8;
+            --danger: #b42318;
+            --shadow: 0 8px 25px rgba(23, 32, 51, 0.08);
+        }
+
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: var(--cream);
+            color: var(--text);
+        }
+
+
+        /* Header */
+
+        .page-header {
+            background: var(--navy);
+            color: white;
+
+            padding: 22px 35px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+
+        .page-header h1 {
+            margin: 0;
+
+            font-size: 21px;
+
+            letter-spacing: 0.3px;
+        }
+
+
+        .page-header span {
+            color: #cbd2df;
+
+            font-size: 13px;
+        }
+
+
+        /* Main */
+
+        .container {
+            max-width: 700px;
+
+            margin: 50px auto;
+
+            padding: 0 20px;
+        }
+
+
+        .title-section {
+            margin-bottom: 25px;
+        }
+
+
+        .title-section h2 {
+            margin: 0 0 7px;
+
+            color: var(--navy);
+
+            font-size: 27px;
+        }
+
+
+        .title-section p {
+            margin: 0;
+
+            color: var(--muted);
+
+            font-size: 14px;
+        }
+
+
+        /* Form Card */
+
+        .form-card {
+            background: var(--white);
+
+            border: 1px solid var(--border);
+
+            border-radius: 12px;
+
+            padding: 35px;
+
+            box-shadow: var(--shadow);
+        }
+
+
+        .form-card::before {
+            content: "";
+
+            display: block;
+
+            width: 45px;
+            height: 3px;
+
+            background: var(--gold);
+
+            margin-bottom: 25px;
+        }
+
+
+        /* Info */
+
+        .info-box {
+            background: #faf9f5;
+
+            border-left: 3px solid var(--gold);
+
+            padding: 13px 15px;
+
+            margin-bottom: 25px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+            line-height: 1.5;
+        }
+
+
+        /* Form */
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+
+        .form-group label {
+            display: block;
+
+            margin-bottom: 8px;
+
+            color: var(--navy);
+
+            font-size: 13px;
+
+            font-weight: 600;
+        }
+
+
+        .required {
+            color: var(--danger);
+        }
+
+
+        .form-control {
+            width: 100%;
+
+            padding: 12px 13px;
+
+            border: 1px solid #cbd2dc;
+
+            border-radius: 6px;
+
+            background: white;
+
+            color: var(--text);
+
+            font-size: 14px;
+
+            outline: none;
+
+            transition:
+                border-color 0.2s,
+                box-shadow 0.2s;
+        }
+
+
+        .form-control:focus {
+            border-color: var(--gold);
+
+            box-shadow:
+                0 0 0 3px rgba(201, 162, 39, 0.12);
+        }
+
+
+        /* Footer */
+
+        .form-footer {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-top: 30px;
+
+            padding-top: 22px;
+
+            border-top: 1px solid var(--border);
+        }
+
+
+        .submit-btn {
+            background: var(--navy);
+
+            color: white;
+
+            border: none;
+
+            padding: 12px 22px;
+
+            border-radius: 6px;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+        }
+
+
+        .submit-btn:hover {
+            background: var(--navy-light);
+        }
+
+
+        .back-link {
+            color: var(--navy);
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            font-weight: 600;
+        }
+
+
+        .back-link:hover {
+            color: var(--gold);
+        }
+
+
+        /* Responsive */
+
+        @media (max-width: 600px) {
+
+            .page-header {
+                padding: 18px 20px;
+            }
+
+
+            .page-header span {
+                display: none;
+            }
+
+
+            .container {
+                margin: 25px auto;
+            }
+
+
+            .form-card {
+                padding: 25px 20px;
+            }
+
+
+            .form-footer {
+                flex-direction: column-reverse;
+
+                gap: 15px;
+
+                align-items: stretch;
+            }
+
+
+            .submit-btn {
+                width: 100%;
+            }
+
+
+            .back-link {
+                text-align: center;
+            }
+
+        }
+
+    </style>
+
 </head>
+
 
 <body>
 
-    <h1>Crime Record Management System</h1>
 
-    <h2>Link Criminal to FIR</h2>
+<!-- Header -->
 
-    <form action="backend/link_criminal.php" method="POST">
+<header class="page-header">
 
-        <label>Select FIR</label><br>
+    <h1>
+        Crime Record Management System
+    </h1>
 
-        <select name="fir_id" required>
 
-            <option value="">-- Select FIR --</option>
+    <span>
 
-            <?php while ($fir = $fir_result->fetch_assoc()) { ?>
+        Police ID:
+        <?php echo htmlspecialchars($_SESSION['police_id']); ?>
 
-                <option value="<?php echo $fir['fir_id']; ?>">
-                    <?php echo htmlspecialchars($fir['fir_number']); ?>
-                </option>
+    </span>
 
-            <?php } ?>
+</header>
 
-        </select>
 
-        <br><br>
 
-        <label>Select Criminal</label><br>
+<!-- Main -->
 
-        <select name="criminal_id" required>
+<main class="container">
 
-            <option value="">-- Select Criminal --</option>
 
-            <?php while ($criminal = $criminal_result->fetch_assoc()) { ?>
+    <div class="title-section">
 
-                <option value="<?php echo $criminal['criminal_id']; ?>">
-                    <?php echo htmlspecialchars($criminal['name']); ?>
-                </option>
+        <h2>Link Criminal to FIR</h2>
 
-            <?php } ?>
+        <p>
+            Associate a criminal record with an existing FIR case.
+        </p>
 
-        </select>
+    </div>
 
-        <br><br>
 
-        <button type="submit">Link Criminal</button>
 
-    </form>
+    <!-- Form Card -->
 
-    <br>
+    <div class="form-card">
 
-    <a href="dashboard.php">Back to Dashboard</a>
+
+        <div class="info-box">
+
+            Select an FIR and a criminal record to create their
+            relationship in the crime database.
+
+        </div>
+
+
+        <form
+            action="backend/link_criminal.php"
+            method="POST"
+        >
+
+
+            <!-- FIR -->
+
+            <div class="form-group">
+
+                <label for="fir_id">
+
+                    Select FIR
+
+                    <span class="required">*</span>
+
+                </label>
+
+
+                <select
+                    class="form-control"
+                    id="fir_id"
+                    name="fir_id"
+                    required
+                >
+
+                    <option value="">
+                        -- Select FIR --
+                    </option>
+
+
+                    <?php while ($fir = $fir_result->fetch_assoc()) { ?>
+
+                        <option value="<?php echo $fir['fir_id']; ?>">
+
+                            <?php echo htmlspecialchars($fir['fir_number']); ?>
+
+                        </option>
+
+                    <?php } ?>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- Criminal -->
+
+            <div class="form-group">
+
+                <label for="criminal_id">
+
+                    Select Criminal
+
+                    <span class="required">*</span>
+
+                </label>
+
+
+                <select
+                    class="form-control"
+                    id="criminal_id"
+                    name="criminal_id"
+                    required
+                >
+
+                    <option value="">
+                        -- Select Criminal --
+                    </option>
+
+
+                    <?php while ($criminal = $criminal_result->fetch_assoc()) { ?>
+
+                        <option value="<?php echo $criminal['criminal_id']; ?>">
+
+                            <?php echo htmlspecialchars($criminal['name']); ?>
+
+                        </option>
+
+                    <?php } ?>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- Footer -->
+
+            <div class="form-footer">
+
+                <a
+                    class="back-link"
+                    href="dashboard.php"
+                >
+                    ← Back to Dashboard
+                </a>
+
+
+                <button
+                    class="submit-btn"
+                    type="submit"
+                >
+                    Link Criminal
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+
+</main>
+
 
 </body>
 

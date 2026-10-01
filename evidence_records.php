@@ -47,6 +47,7 @@ $result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -57,148 +58,240 @@ $result = $stmt->get_result();
 
     <title>Evidence Records</title>
 
+    <link rel="stylesheet" href="records.css">
+
 </head>
 
 <body>
 
+
+<header class="page-header">
+
     <h1>Crime Record Management System</h1>
 
-    <h2>Evidence Records</h2>
+    <span>
+        Police ID:
+        <?php echo htmlspecialchars($_SESSION['police_id']); ?>
+    </span>
+
+</header>
 
 
-    <form method="GET" action="evidence_records.php">
+<main class="container">
 
-        <input
-            type="text"
-            name="search"
-            placeholder="Search evidence..."
-            value="<?php echo htmlspecialchars($search); ?>"
+
+    <div class="title-row">
+
+        <h2>Evidence Records</h2>
+
+        <a
+            class="primary-link"
+            href="evidence_add.php"
+        >
+            + Add Evidence
+        </a>
+
+    </div>
+
+
+    <!-- Search -->
+
+    <div class="search-box">
+
+        <form
+            class="search-form"
+            method="GET"
+            action="evidence_records.php"
         >
 
-        <button type="submit">Search</button>
+            <input
+                type="text"
+                name="search"
+                placeholder="Search FIR number, file name, type..."
+                value="<?php echo htmlspecialchars($search); ?>"
+            >
 
-        <a href="evidence_records.php">Clear</a>
+            <button
+                class="search-btn"
+                type="submit"
+            >
+                Search
+            </button>
 
-    </form>
+            <a
+                class="clear-btn"
+                href="evidence_records.php"
+            >
+                Clear
+            </a>
 
+        </form>
 
-    <br>
-
-
-    <table border="1" cellpadding="8">
-
-        <tr>
-
-            <th>Evidence ID</th>
-
-            <th>FIR Number</th>
-
-            <th>File Name</th>
-
-            <th>File Type</th>
-
-            <th>Description</th>
-
-            <th>Uploaded At</th>
-
-            <th>View File</th>
-
-            <th>Action</th>
-
-        </tr>
+    </div>
 
 
-        <?php if ($result->num_rows > 0) { ?>
+    <!-- Evidence Table -->
 
-            <?php while ($row = $result->fetch_assoc()) { ?>
+    <div class="table-card">
+
+        <table>
+
+            <thead>
 
                 <tr>
 
-                    <td>
-                        <?php echo htmlspecialchars($row['evidence_id']); ?>
-                    </td>
+                    <th>Evidence ID</th>
 
-                    <td>
-                        <?php echo htmlspecialchars($row['fir_number']); ?>
-                    </td>
+                    <th>FIR Number</th>
 
-                    <td>
-                        <?php echo htmlspecialchars($row['file_name']); ?>
-                    </td>
+                    <th>File Name</th>
 
-                    <td>
-                        <?php echo htmlspecialchars($row['file_type'] ?? ''); ?>
-                    </td>
+                    <th>File Type</th>
 
-                    <td>
-                        <?php echo htmlspecialchars($row['description'] ?? ''); ?>
-                    </td>
+                    <th>Description</th>
 
-                    <td>
-                        <?php echo htmlspecialchars($row['uploaded_at']); ?>
-                    </td>
+                    <th>Uploaded At</th>
 
-                    <td>
+                    <th>View File</th>
 
-                        <a
-                            href="<?php echo htmlspecialchars($row['file_path']); ?>"
-                            target="_blank">
-                            Open File
-                        </a>
-
-                    </td>
-
-                    <td>
-
-                        <a href="evidence_edit.php?id=<?php echo $row['evidence_id']; ?>">
-                            Edit
-                        </a>
-
-                        <a href="backend/evidence_delete.php?id=<?php echo $row['evidence_id']; ?>"
-                           onclick="return confirm('Are you sure you want to delete this evidence?');">
-                           Delete
-                        </a>
-
-                    </td>
+                    <th>Action</th>
 
                 </tr>
 
-            <?php } ?>
-
-        <?php } else { ?>
-
-            <tr>
-
-                <td colspan="8">
-                    No evidence records found.
-                </td>
-
-            </tr>
-
-        <?php } ?>
-
-    </table>
+            </thead>
 
 
-    <br>
+            <tbody>
 
 
-    <a href="evidence_add.php">
-        Add Evidence
-    </a>
+                <?php if ($result->num_rows > 0) { ?>
 
 
-    <br><br>
+                    <?php while ($row = $result->fetch_assoc()) { ?>
 
 
-    <a href="dashboard.php">
-        Back to Dashboard
-    </a>
+                        <tr>
+
+                            <td>
+                                <?php echo htmlspecialchars($row['evidence_id']); ?>
+                            </td>
+
+
+                            <td>
+
+                                <strong>
+                                    <?php echo htmlspecialchars($row['fir_number']); ?>
+                                </strong>
+
+                            </td>
+
+
+                            <td>
+                                <?php echo htmlspecialchars($row['file_name']); ?>
+                            </td>
+
+
+                            <td>
+                                <?php echo htmlspecialchars($row['file_type'] ?? ''); ?>
+                            </td>
+
+
+                            <td>
+                                <?php echo htmlspecialchars($row['description'] ?? ''); ?>
+                            </td>
+
+
+                            <td>
+                                <?php echo htmlspecialchars($row['uploaded_at']); ?>
+                            </td>
+
+
+                            <td>
+
+                                <a
+                                    class="action-edit"
+                                    href="<?php echo htmlspecialchars($row['file_path']); ?>"
+                                    target="_blank"
+                                >
+                                    Open File
+                                </a>
+
+                            </td>
+
+
+                            <td>
+
+                                <a
+                                    class="action-edit"
+                                    href="evidence_edit.php?id=<?php echo $row['evidence_id']; ?>"
+                                >
+                                    Edit
+                                </a>
+
+                                &nbsp;|&nbsp;
+
+                                <a
+                                    class="action-delete"
+                                    href="backend/evidence_delete.php?id=<?php echo $row['evidence_id']; ?>"
+                                    onclick="return confirm('Are you sure you want to delete this evidence?');"
+                                >
+                                    Delete
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+
+                    <?php } ?>
+
+
+                <?php } else { ?>
+
+
+                    <tr>
+
+                        <td
+                            colspan="8"
+                            style="text-align: center; padding: 30px;"
+                        >
+
+                            No evidence records found.
+
+                        </td>
+
+                    </tr>
+
+
+                <?php } ?>
+
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <div class="bottom-links">
+
+        <a
+            class="secondary-link"
+            href="dashboard.php"
+        >
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+
+</main>
 
 
 </body>
 
 </html>
+
 
 <?php
 

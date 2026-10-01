@@ -53,6 +53,7 @@ $result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -63,150 +64,259 @@ $result = $stmt->get_result();
 
     <title>Criminal Records</title>
 
+    <link rel="stylesheet" href="records.css">
+
 </head>
 
 <body>
 
+
+<!-- Header -->
+
+<header class="page-header">
+
     <h1>Crime Record Management System</h1>
 
-    <h2>Criminal Records</h2>
+    <span>
+        Police ID:
+        <?php echo htmlspecialchars($_SESSION['police_id']); ?>
+    </span>
+
+</header>
 
 
-    <form method="GET" action="criminal_records.php">
+<!-- Main Content -->
 
-        <input
-            type="text"
-            name="search"
-            placeholder="Search criminal..."
-            value="<?php echo htmlspecialchars($search); ?>"
+<main class="container">
+
+
+    <div class="title-row">
+
+        <h2>Criminal Records</h2>
+
+        <a
+            class="primary-link"
+            href="criminal_register.php"
+        >
+            + Add Criminal
+        </a>
+
+    </div>
+
+
+    <!-- Search -->
+
+    <div class="search-box">
+
+        <form
+            class="search-form"
+            method="GET"
+            action="criminal_records.php"
         >
 
-        <button type="submit">Search</button>
+            <input
+                type="text"
+                name="search"
+                placeholder="Search criminal name, address, mobile..."
+                value="<?php echo htmlspecialchars($search); ?>"
+            >
 
-        <a href="criminal_records.php">Clear</a>
+            <button
+                class="search-btn"
+                type="submit"
+            >
+                Search
+            </button>
 
-    </form>
+            <a
+                class="clear-btn"
+                href="criminal_records.php"
+            >
+                Clear
+            </a>
 
+        </form>
 
-    <br>
-
-
-    <table border="1" cellpadding="8">
-
-        <tr>
-
-            <th>Criminal ID</th>
-
-            <th>Name</th>
-
-            <th>Gender</th>
-
-            <th>Date of Birth</th>
-
-            <th>Address</th>
-
-            <th>Mobile</th>
-
-            <th>Identification Mark</th>
-
-            <th>Associated FIRs</th>
-
-            <th>Action</th>
-
-        </tr>
+    </div>
 
 
-        <?php if ($result->num_rows > 0) { ?>
+    <!-- Table -->
 
-            <?php while ($row = $result->fetch_assoc()) { ?>
+    <div class="table-card">
+
+        <table>
+
+            <thead>
 
                 <tr>
 
-                    <td>
-                        <?php echo htmlspecialchars($row['criminal_id']); ?>
-                    </td>
+                    <th>Criminal ID</th>
 
-                    <td>
-                        <?php echo htmlspecialchars($row['name']); ?>
-                    </td>
+                    <th>Name</th>
 
-                    <td>
-                        <?php echo htmlspecialchars($row['gender']); ?>
-                    </td>
+                    <th>Gender</th>
 
-                    <td>
-                        <?php echo htmlspecialchars($row['date_of_birth'] ?? ''); ?>
-                    </td>
+                    <th>Date of Birth</th>
 
-                    <td>
-                        <?php echo htmlspecialchars($row['address']); ?>
-                    </td>
+                    <th>Address</th>
 
-                    <td>
-                        <?php echo htmlspecialchars($row['mobile'] ?? ''); ?>
-                    </td>
+                    <th>Mobile</th>
 
-                    <td>
-                        <?php echo htmlspecialchars($row['identification_mark'] ?? ''); ?>
-                    </td>
+                    <th>Identification Mark</th>
 
-                    <td>
-                        <?php echo htmlspecialchars(
-                            $row['fir_numbers'] ?? 'No FIR linked'
-                        ); ?>
-                    </td>
+                    <th>Associated FIRs</th>
 
-                    <td>
-
-                        <a href="criminal_edit.php?id=<?php echo $row['criminal_id']; ?>">
-                            Edit
-                        </a>
-
-                        <a href="backend/criminal_delete.php?id=<?php echo $row['criminal_id']; ?>"
-                           onclick="return confirm('Are you sure you want to delete this criminal record?');">
-                           Delete
-                        </a>
-
-                    </td>
+                    <th>Action</th>
 
                 </tr>
 
-            <?php } ?>
-
-        <?php } else { ?>
-
-            <tr>
-
-                <td colspan="9">
-                    No criminal records found.
-                </td>
-
-            </tr>
-
-        <?php } ?>
-
-    </table>
+            </thead>
 
 
-    <br>
+            <tbody>
 
 
-    <a href="criminal_register.php">
-        Add Criminal
-    </a>
+                <?php if ($result->num_rows > 0) { ?>
 
 
-    <br><br>
+                    <?php while ($row = $result->fetch_assoc()) { ?>
 
 
-    <a href="dashboard.php">
-        Back to Dashboard
-    </a>
+                        <tr>
+
+                            <td>
+                                <?php echo htmlspecialchars($row['criminal_id']); ?>
+                            </td>
+
+
+                            <td>
+
+                                <strong>
+                                    <?php echo htmlspecialchars($row['name']); ?>
+                                </strong>
+
+                            </td>
+
+
+                            <td>
+                                <?php echo htmlspecialchars($row['gender']); ?>
+                            </td>
+
+
+                            <td>
+                                <?php echo htmlspecialchars($row['date_of_birth'] ?? ''); ?>
+                            </td>
+
+
+                            <td>
+                                <?php echo htmlspecialchars($row['address']); ?>
+                            </td>
+
+
+                            <td>
+                                <?php echo htmlspecialchars($row['mobile'] ?? ''); ?>
+                            </td>
+
+
+                            <td>
+                                <?php echo htmlspecialchars($row['identification_mark'] ?? ''); ?>
+                            </td>
+
+
+                            <td>
+
+                                <?php
+
+                                if (!empty($row['fir_numbers'])) {
+
+                                    echo htmlspecialchars($row['fir_numbers']);
+
+                                } else {
+
+                                    echo '<span class="status">No FIR linked</span>';
+
+                                }
+
+                                ?>
+
+                            </td>
+
+
+                            <td>
+
+                                <a
+                                    class="action-edit"
+                                    href="criminal_edit.php?id=<?php echo $row['criminal_id']; ?>"
+                                >
+                                    Edit
+                                </a>
+
+                                &nbsp;|&nbsp;
+
+                                <a
+                                    class="action-delete"
+                                    href="backend/criminal_delete.php?id=<?php echo $row['criminal_id']; ?>"
+                                    onclick="return confirm('Are you sure you want to delete this criminal record?');"
+                                >
+                                    Delete
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+
+                    <?php } ?>
+
+
+                <?php } else { ?>
+
+
+                    <tr>
+
+                        <td
+                            colspan="9"
+                            style="text-align: center; padding: 30px;"
+                        >
+
+                            No criminal records found.
+
+                        </td>
+
+                    </tr>
+
+
+                <?php } ?>
+
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- Bottom Navigation -->
+
+    <div class="bottom-links">
+
+        <a
+            class="secondary-link"
+            href="dashboard.php"
+        >
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+
+</main>
 
 
 </body>
 
 </html>
+
 
 <?php
 
