@@ -140,6 +140,11 @@ $result = $stmt->get_result();
                             Edit
                         </a>
 
+                        <a href="backend/report_delete.php?id=<?php echo $row['report_id']; ?>"
+                           onclick="return confirm('Are you sure you want to delete this report?');">
+                           Delete
+                        </a>
+
                     </td>
 
                 </tr>

@@ -164,6 +164,11 @@ $result = $stmt->get_result();
                             Edit
                         </a>
 
+                        <a href="backend/fir_delete.php?id=<?php echo $row['fir_id']; ?>"
+                           onclick="return confirm('Are you sure you want to delete this FIR?');">
+                           Delete
+                        </a>
+
                     </td>
 
                 </tr>

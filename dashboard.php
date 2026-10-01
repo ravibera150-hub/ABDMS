@@ -75,10 +75,6 @@ if (!isset($_SESSION['police_id'])) {
 
     <br><br>
 
-    <a href="xml_export.php">Generate XML Records</a>
-
-    <br><br>
-
     <a href="logout.php">Logout</a>
 
 </body>

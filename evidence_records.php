@@ -154,6 +154,11 @@ $result = $stmt->get_result();
                             Edit
                         </a>
 
+                        <a href="backend/evidence_delete.php?id=<?php echo $row['evidence_id']; ?>"
+                           onclick="return confirm('Are you sure you want to delete this evidence?');">
+                           Delete
+                        </a>
+
                     </td>
 
                 </tr>
