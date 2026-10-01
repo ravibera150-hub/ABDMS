@@ -16,6 +16,14 @@ if (!isset($_GET['id'])) {
 
 $report_id = $_GET['id'];
 
+if (!filter_var($report_id, FILTER_VALIDATE_INT)) {
+    die("Invalid report ID.");
+}
+
+
+/*
+ * Delete report
+ */
 $sql = "DELETE FROM report
         WHERE report_id = ?";
 
@@ -26,18 +34,20 @@ $stmt->bind_param(
     $report_id
 );
 
-if ($stmt->execute()) {
+$stmt->execute();
 
-    header("Location: ../report_records.php");
-    exit();
+if ($stmt->affected_rows !== 1) {
 
-} else {
+    $stmt->close();
+    $conn->close();
 
-    echo "Error deleting report: " . $stmt->error;
-
+    die("Report record not found.");
 }
 
 $stmt->close();
 $conn->close();
+
+header("Location: ../report_records.php");
+exit();
 
 ?>

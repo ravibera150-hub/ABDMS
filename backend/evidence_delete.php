@@ -16,9 +16,14 @@ if (!isset($_GET['id'])) {
 
 $evidence_id = $_GET['id'];
 
+if (!filter_var($evidence_id, FILTER_VALIDATE_INT)) {
+    die("Invalid evidence ID.");
+}
 
-// Get file path before deleting database record
 
+/*
+ * Get physical file path
+ */
 $sql = "SELECT file_path
         FROM evidence
         WHERE evidence_id = ?";
@@ -34,7 +39,11 @@ $stmt->execute();
 
 $result = $stmt->get_result();
 
-if ($result->num_rows != 1) {
+if ($result->num_rows !== 1) {
+
+    $stmt->close();
+    $conn->close();
+
     die("Evidence record not found.");
 }
 
@@ -43,39 +52,61 @@ $evidence = $result->fetch_assoc();
 $stmt->close();
 
 
-// Delete database record
+/*
+ * Start transaction
+ */
+$conn->begin_transaction();
 
-$sql = "DELETE FROM evidence
-        WHERE evidence_id = ?";
+try {
 
-$stmt = $conn->prepare($sql);
+    $sql = "DELETE FROM evidence
+            WHERE evidence_id = ?";
 
-$stmt->bind_param(
-    "i",
-    $evidence_id
-);
+    $stmt = $conn->prepare($sql);
 
-if ($stmt->execute()) {
+    $stmt->bind_param(
+        "i",
+        $evidence_id
+    );
 
-    // Delete physical file
+    $stmt->execute();
 
-    $file_path = "../" . $evidence['file_path'];
-
-    if (file_exists($file_path)) {
-        unlink($file_path);
+    if ($stmt->affected_rows !== 1) {
+        throw new Exception("Evidence record could not be deleted.");
     }
+
+    $stmt->close();
+
+    /*
+     * Confirm database deletion
+     */
+    $conn->commit();
+
+
+    /*
+     * Delete physical file
+     */
+    if (!empty($evidence['file_path'])) {
+
+        $physical_path =
+            __DIR__ . "/../" . $evidence['file_path'];
+
+        if (file_exists($physical_path)) {
+            unlink($physical_path);
+        }
+    }
+
+    $conn->close();
 
     header("Location: ../evidence_records.php");
     exit();
 
-} else {
+} catch (Exception $e) {
 
-    echo "Error deleting evidence: " . $stmt->error;
+    $conn->rollback();
+    $conn->close();
 
+    echo "Error deleting evidence: " . $e->getMessage();
 }
-
-
-$stmt->close();
-$conn->close();
 
 ?>

@@ -9,54 +9,125 @@ if (!isset($_SESSION['police_id'])) {
 
 require_once "db.php";
 
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header("Location: ../evidence_add.php");
+    exit();
+}
 
-$fir_id = $_POST['fir_id'];
-$description = $_POST['description'];
+$fir_id = $_POST['fir_id'] ?? '';
+$description = trim($_POST['description'] ?? '');
 
+if ($fir_id === '') {
+    die("FIR is required.");
+}
+
+if (!filter_var($fir_id, FILTER_VALIDATE_INT)) {
+    die("Invalid FIR ID.");
+}
 
 if (!isset($_FILES['evidence_file'])) {
     die("No file uploaded.");
 }
 
-
 $file = $_FILES['evidence_file'];
 
-$file_name = $file['name'];
-$file_tmp = $file['tmp_name'];
-$file_type = $file['type'];
-$file_error = $file['error'];
-
-
-if ($file_error !== UPLOAD_ERR_OK) {
+if ($file['error'] !== UPLOAD_ERR_OK) {
     die("Error uploading file.");
+}
+
+if ($file['size'] <= 0) {
+    die("Uploaded file is empty.");
 }
 
 
 /*
- * Create a unique file name
- * so that two files with the same original
- * name do not overwrite each other.
+ * Check whether FIR exists
  */
+$sql = "SELECT fir_id
+        FROM fir
+        WHERE fir_id = ?";
 
-$unique_name = uniqid() . "_" . basename($file_name);
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $fir_id);
+$stmt->execute();
 
-$upload_path = __DIR__ . "/../uploads/evidence/" . $unique_name;
+$result = $stmt->get_result();
+
+if ($result->num_rows !== 1) {
+    $stmt->close();
+    $conn->close();
+    die("FIR record not found.");
+}
+
+$stmt->close();
 
 
 /*
- * Move uploaded file from temporary location
- * to our project's evidence folder.
+ * Validate file type
  */
+$allowed_types = [
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'application/pdf',
+    'text/plain'
+];
 
-if (!move_uploaded_file($file_tmp, $upload_path)) {
+$finfo = new finfo(FILEINFO_MIME_TYPE);
+$detected_type = $finfo->file($file['tmp_name']);
+
+if (!in_array($detected_type, $allowed_types, true)) {
+    $conn->close();
+    die("File type is not allowed.");
+}
+
+
+/*
+ * Maximum file size: 5 MB
+ */
+$max_size = 5 * 1024 * 1024;
+
+if ($file['size'] > $max_size) {
+    $conn->close();
+    die("File size must not exceed 5 MB.");
+}
+
+
+/*
+ * Generate safe unique file name
+ */
+$original_name = basename($file['name']);
+
+$extension = strtolower(
+    pathinfo($original_name, PATHINFO_EXTENSION)
+);
+
+$unique_name = uniqid('', true) . "." . $extension;
+
+$upload_directory = __DIR__ . "/../uploads/evidence/";
+
+if (!is_dir($upload_directory)) {
+    mkdir($upload_directory, 0755, true);
+}
+
+$upload_path = $upload_directory . $unique_name;
+
+
+/*
+ * Move uploaded file
+ */
+if (!move_uploaded_file(
+    $file['tmp_name'],
+    $upload_path
+)) {
+    $conn->close();
     die("Failed to save uploaded file.");
 }
 
 
 /*
- * Store file information in database.
+ * Store evidence information
  */
-
 $db_file_path = "uploads/evidence/" . $unique_name;
 
 $sql = "INSERT INTO evidence
@@ -68,23 +139,32 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param(
     "issss",
     $fir_id,
-    $file_name,
+    $original_name,
     $db_file_path,
-    $file_type,
+    $detected_type,
     $description
 );
 
-
 if ($stmt->execute()) {
 
-    echo "Evidence uploaded successfully!";
+    $stmt->close();
+    $conn->close();
+
+    header("Location: ../evidence_records.php");
+    exit();
 
 } else {
 
+    /*
+     * Database insert failed.
+     * Remove uploaded file so there is no orphan file.
+     */
+    if (file_exists($upload_path)) {
+        unlink($upload_path);
+    }
+
     echo "Error saving evidence: " . $stmt->error;
-
 }
-
 
 $stmt->close();
 $conn->close();
