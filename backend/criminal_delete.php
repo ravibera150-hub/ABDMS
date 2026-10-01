@@ -16,16 +16,15 @@ if (!isset($_GET['id'])) {
 
 $criminal_id = $_GET['id'];
 
-
-// Start transaction
+if (!filter_var($criminal_id, FILTER_VALIDATE_INT)) {
+    die("Invalid criminal ID.");
+}
 
 $conn->begin_transaction();
 
-
 try {
 
-    // First remove FIR-Criminal relationships
-
+    // Remove FIR-Criminal relationships first
     $sql = "DELETE FROM fir_criminal
             WHERE criminal_id = ?";
 
@@ -37,12 +36,10 @@ try {
     );
 
     $stmt->execute();
-
     $stmt->close();
 
 
-    // Now delete the criminal record
-
+    // Delete criminal record
     $sql = "DELETE FROM criminal
             WHERE criminal_id = ?";
 
@@ -55,29 +52,27 @@ try {
 
     $stmt->execute();
 
+    if ($stmt->affected_rows !== 1) {
+        throw new Exception("Criminal record not found.");
+    }
+
     $stmt->close();
 
 
-    // Confirm all changes
-
+    // Confirm transaction
     $conn->commit();
 
+    $conn->close();
 
     header("Location: ../criminal_records.php");
     exit();
 
-
 } catch (Exception $e) {
 
-    // Undo changes if anything fails
-
     $conn->rollback();
+    $conn->close();
 
     echo "Error deleting criminal: " . $e->getMessage();
-
 }
-
-
-$conn->close();
 
 ?>
